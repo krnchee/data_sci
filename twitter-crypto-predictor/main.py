@@ -3,7 +3,7 @@ import requests_oauthlib
 import json
 import matplotlib.pyplot as plt
 
-url = "https://api.twitter.com/1.1/search/tweets.json?q=ethereum&count=50"
+url = "https://api.twitter.com/1.1/search/tweets.json?q=ethereum&count=100"
 
 twitter_consumer_key = 	'ZPZp0TRl1mSRyWIHdWg2Y0V0X'
 twitter_consumer_secret = '0SMJBx7NgWepI7vlgdUK0RHoKjWvbXow6uUdfYIlq9005kNAvR'
@@ -21,7 +21,7 @@ auth = requests_oauthlib.OAuth1(twitter_consumer_key,
 
 response = requests.get(url, auth = auth)
 tweet_json = response.json()
-print(tweet_json)
+# print(tweet_json)
 tweet = tweet_json['statuses'][0]['text']
 id_str = tweet_json['statuses'][0]['id_str']
 lang = tweet_json['statuses'][0]['lang']
@@ -29,38 +29,40 @@ bad = {}
 badData = {}
 time = []
 
-for i in range(0,50):
-    statuses = tweet_json['statuses']
-    for i in range(len(statuses)):
-        tweet = statuses[i]['text']
-        id_str = statuses[i]['id_str']
-        lang = statuses[i]['lang']
-        #  currentTime goes up to the minute, so two tweets a few seconds
-        # appart will have the same currentTime.
-        currentTime = statuses[i]['created_at'][0:16]
-        if lang == 'en':
-            for word in keywords:
-                if word in tweet:
-                    if currentTime in bad:
-                        bad[currentTime] += 1
-                        # adds new tweet to the tweet list for that time.
-                        badData[currentTime].append(tweet)
-                    else:
-                        bad[currentTime] = 1
-                        badData[currentTime] = [tweet]
-                        time.append(currentTime)
-                    break # break is used to exit for loop. if we find
-                           # one keyword, no reason to see if the tweet
-                           # has another keyword
-        # print(bad)
-        # print(badData)
-        # print(time)
-        try:
-            response = requests.get(url, auth = auth)
-            tweet_json = response.json()
-            statuses = tweet_json['statuses']
-        except:
-            break
+# for i in range(0,20):
+statuses = tweet_json['statuses']
+for i in range(len(statuses)):
+    # print(len(statuses))
+    tweet = statuses[i]['text']
+    id_str = statuses[i]['id_str']
+    lang = statuses[i]['lang']
+    print(id_str)
+    #  currentTime goes up to the minute, so two tweets a few seconds
+    # appart will have the same currentTime.
+    currentTime = statuses[i]['created_at'][0:16]
+    if lang == 'en':
+        for word in keywords:
+            if word in tweet:
+                if currentTime in bad:
+                    bad[currentTime] += 1
+                    # adds new tweet to the tweet list for that time.
+                    badData[currentTime].append(tweet)
+                else:
+                    bad[currentTime] = 1
+                    badData[currentTime] = [tweet]
+                    time.append(currentTime)
+                break # break is used to exit for loop. if we find
+                       # one keyword, no reason to see if the tweet
+                       # has another keyword
+    print(bad)
+    print(badData)
+    print(time)
+    try:
+        response = requests.get(url, auth = auth)
+        tweet_json = response.json()
+        statuses = tweet_json['statuses']
+    except:
+        break
 
 badPlot = []
 timePlot = []
